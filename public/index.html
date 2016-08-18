@@ -1,1 +1,23 @@
-<h1>succcesss</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        li {
+            padding: 5px;
+        }
+    </style>
+</head>
+<body style="font-family: monospace; ">
+    <form action="api/donor/" method="POST">
+        <ul style="padding: 2px;">
+            <li>Name=======<input type="text" name="firstname"><br></li>
+            <li>Lastname===<input type="text" name="lastname" id=""><br></li>
+            <li>Email======<input type="text" name="email" id=""><br></li>
+            <li>Bloodtype==<input type="text" name="bloodtype" id=""><br></li>
+            <li>GEO X======<input type="text" name="geo_x" id=""><br></li>
+            <li>GEO Y======<input type="text" name="geo_y" id=""><br></li>
+        </ul>
+        <input type="submit" value="POST">
+    </form>
+</body>
+</html>
