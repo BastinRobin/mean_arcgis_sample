@@ -1,4 +1,5 @@
 var express     = require("express")
+var f           = require("../../controllers/donor")
 var router      = express.Router()
 
 // Get static donor edit page
@@ -6,7 +7,7 @@ router.get("/edit/:id", unify)
 
 // POST /donor/
 // Create donor
-router.post("/", unify)
+router.post("/", f.POST)
 
 // POST /donor/find
 // Retrieve donor IDs in specified area on map
