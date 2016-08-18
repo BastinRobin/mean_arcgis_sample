@@ -3,5 +3,7 @@ var router      = express.Router()
 
 // Get single page app
 router.get(function(req, res) {
-    res.sendfile("./public/index.html");
+    res.send("OK")
 })
+
+module.exports = router;

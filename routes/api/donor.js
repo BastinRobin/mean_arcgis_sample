@@ -34,3 +34,5 @@ function unify(req, res) {
     console.log(json);
     res.json(json);
 }
+
+module.exports = router;
