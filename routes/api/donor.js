@@ -6,7 +6,7 @@ router.get("/edit/:id", unify)
 
 // POST /donor/
 // Create donor
-router.post(unify)
+router.post("/", unify)
 
 // POST /donor/find
 // Retrieve donor IDs in specified area on map
