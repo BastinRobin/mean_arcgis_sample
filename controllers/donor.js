@@ -6,11 +6,11 @@ exports.POST = function(req, res) {
     var donor = new Donor(req.body)
     // Validate the posted data
     donor.validate(function(err) {
-        // If no errors present
-        if (assert.equal(err, null)) {
+        // Check errors
+        if (!err) {
             // Try saving
             donor.save(function(err) {
-                if (assert.equal(err, null)) {
+                if (!err) {
                     //  Success
                     // @TODO return unique id Req#7
                     res.sendStatus(200)
@@ -26,6 +26,9 @@ exports.POST = function(req, res) {
             })
         }
         else {
+            if (CONFIG.DEBUG) {
+                console.log(err)
+            }
             // Invalid data posted
             res.sendStatus(418)
             // @TODO Improve this (maybe redirect to page? show dynamic message?)

@@ -49,6 +49,9 @@ var donorSchema = new Schema({
             validator: validation.double,
             message: "Please provide a valid longitude"
         }
+    },
+    unique_param: {
+        type: String
     }
 })
 
