@@ -1,5 +1,6 @@
 var CONFIG  = require("../config")
 var Donor   = require("../models/donor")
+var crypto  = require("crypto")
 
 // POST /donor/
 exports.POST = function(req, res) {
@@ -8,6 +9,13 @@ exports.POST = function(req, res) {
     donor.validate(function(err) {
         // Check errors
         if (!err) {
+            console.log(donor)
+            // Generate unique_param with sha256 algorithm
+            var shasum = crypto.createHash("sha256")
+                .update(JSON.stringify(donor)) // Take sha256 of donor info
+                .digest("hex") // To hex string
+            console.log(shasum)
+            donor.unique_param = shasum
             // Try saving
             donor.save(function(err) {
                 if (!err) {
