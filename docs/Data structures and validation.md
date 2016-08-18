@@ -9,6 +9,6 @@ Donor information
     lastname    : string    
     email       : string    
     bloodtype   : string    : ^([ABO]|(AB))[\+\-]$
-    geo_x       : float     
-    geo_y       : float     
+    geo_x       : double     
+    geo_y       : double     
     
