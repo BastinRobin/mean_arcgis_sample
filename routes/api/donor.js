@@ -13,13 +13,13 @@ router.post("/", f.POST)
 // Retrieve donor IDs in specified area on map
 router.post("/find", unify)
 
-// REST /donor/[id]
+// REST /donor/{unique_id}
 router.route("/:id")
     // Retrieve donor information
-    .get(unify)
+    .get(f.uniqueGET)
 
     // Update donor information if private ID is supplied
-    .put(unify)
+    .put(f.uniquePUT)
 
     // Delete donor information if private ID is supplied
     .delete(unify)

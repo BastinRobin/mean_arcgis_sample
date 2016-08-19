@@ -9,9 +9,9 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 // Load routes
-app.use(express.static(__dirname + "/public"))
-app.use("/api/donor/",  require("./routes/api/donor.js"))
 app.use("/",            require("./routes/index.js"))
+app.use("/api/donor/",  require("./routes/api/donor.js"))
+app.use(express.static(__dirname + "/public"))
 
 // Ready-set-GO!
 mongoose.connect("mongodb://localhost/bloodonate+")
