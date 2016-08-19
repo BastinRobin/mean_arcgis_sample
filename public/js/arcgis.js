@@ -30,13 +30,17 @@ var view = new MapView({
  *******************************************************************/
 view.on("click", function(evt) {
 // Get the coordinates of the click on the view
-var lat = Math.round(evt.mapPoint.latitude * 1000) / 1000
-var lon = Math.round(evt.mapPoint.longitude * 1000) / 1000
+var x = evt.mapPoint.longitude
+var y = evt.mapPoint.latitude
+var lon = Math.round(evt.mapPoint.longitude * 1000) / 1000  // x
+var lat = Math.round(evt.mapPoint.latitude * 1000) / 1000   // y
 
 view.popup.open({
     // Set the popup's title to the coordinates of the location
-    title: "Reverse geocode: [" + lon + ", " + lat + "]",
-    location: evt.mapPoint // Set the location of the popup to the clicked location
+    title: "Resolving address...",
+    location: evt.mapPoint, // Set the location of the popup to the clicked location
+    content: "Reverse geocode: [" + lon + ", " + lat + "]" + 
+             '<a href="@' + x + ':' + y + '">I can donate blood here</a>'
 })
 
 // Display the popup
@@ -45,10 +49,11 @@ locatorTask.locationToAddress(evt.mapPoint).then(function(
     response) {
     // If an address is successfully found, print it to the popup's content
     var address = response.address.Match_addr
-    view.popup.content = address
+    view.popup.title = address
 }).otherwise(function(err) {
     // If the promise fails and no result is found, print a generic message
     // to the popup's content
-    view.popup.content =
-    "No address was found for this location"
-})})})
+    view.popup.title = "No address was found for this location<br>" + 
+                       "However you can still donate on this location"
+})})
+})

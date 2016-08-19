@@ -1,0 +1,17 @@
+<h2>Update your details</h2>
+<form ng-submit="update_donor($element.action)">
+    <li>Name=======<input type="text" name="firstname" ng-model="donor.data.firstname"><br></li>
+    <li>Lastname===<input type="text" name="lastname" ng-model="donor.data.lastname"><br></li>
+    <li>Phone======<input type="text" name="phone" ng-model="donor.data.phone"><br></li>
+    <li>Email======<input type="text" name="email" ng-model="donor.data.email"><br></li>
+    <li>Bloodtype==<input type="text" name="bloodtype" ng-model="donor.data.bloodtype"><br></li>
+    <p>Recorded IP Address: <span ng-bind="donor.data.ipv4"></span></p>
+    <ul ng-show="donor.validation_errors">
+        Please resolve the errors:
+        <li ng-repeat="error in donor.validation_errors">{{error}}</li>
+    </ul>
+    <input type="submit" value="Save changes">
+</form>
+<form ng-submit="delete_donor($element.action)">
+    <input type="submit" value="Delete permanently">
+</form>

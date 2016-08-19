@@ -28,20 +28,50 @@ function GET_IPv4(req) {
     // Example format returning by express => ::ffff:127.0.0.1
     return ip.substring(7);    
 }
-
+function RETURN_UPDATED_DONOR(res, donor, unique_param) {
+    // delete donor._id will not work
+    //
+    // To use delete you would need to convert the model document into a 
+    // plain JavaScript object by calling toObject so that you can freely manipulate it.
+    // 
+    // user = user.toObject();
+    // delete user.salt;
+    // delete user.pass;
+    //
+    // http://stackoverflow.com/questions/23342558/why-cant-i-delete-a-mongoose-models-object-properties
+    donor._id = undefined;
+    donor.__v = undefined;
+    // Return unique id along with the saved data
+    res.json({ unique_param: unique_param, saved_data: donor })
+}
+// Calculate the error code and sent back to client
+function VALIDATION_ERROR(res, err) {
+    var error_code = 0
+    if (err.errors.firstname) error_code |= 0x01;
+    if (err.errors.lastname)  error_code |= 0x02;
+    if (err.errors.phone)     error_code |= 0x04;
+    if (err.errors.email)     error_code |= 0x08;
+    if (err.errors.bloodtype) error_code |= 0x10;
+    if (err.errors.ipv4)      error_code |= 0x20;
+    if (err.errors.geo_x)     error_code |= 0x40;
+    if (err.errors.geo_y)     error_code |= 0x80;
+    // @TODO TEAPOT
+    res.status(418).json({e:error_code})
+}
 // DELETE api/donor/{unique_param}
 exports.uniqueDELETE = function(req, res) {
+    var unique_param = req.params.id
     // Validate passed link parameter
-    if (validate.hex(req.params.id)) {
+    if (validate.hex(unique_param)) {
         // Try to retrieve donor with matching unique_param
-        Donor.findOneAndRemove({ unique_param: req.params.id }, function(err, doc, result) {
+        Donor.findOneAndRemove({ unique_param: unique_param }, function(err, doc, result) {
             if (!err) {
                 // Document before update. Returns null if no record to delete
                 if (!!doc) {
-                    res.sendStatus(200)
+                    RETURN_UPDATED_DONOR(res, doc, unique_param)
                 } else {
                     // Not found
-                    API_ERROR(res, "Record not found: " + req.params.id, 404)
+                    API_ERROR(res, "Record not found: " + unique_param, 404)
                 }
             } else {
                 // Unexpected error
@@ -55,8 +85,9 @@ exports.uniqueDELETE = function(req, res) {
 }
 // GET api/donor/{unique_param}
 exports.uniqueGET = function(req, res) {
+    var unique_param = req.params.id
     // Try to retrieve donor with matching unique_param
-    Donor.find({ unique_param: req.params.id }, "-_id -unique_param", function(err, donor) {
+    Donor.find({ unique_param: unique_param }, "-_id -unique_param", function(err, donor) {
         if (!err) {
             // Found record
             res.json(donor[0])
@@ -68,24 +99,24 @@ exports.uniqueGET = function(req, res) {
 }
 // PUT api/donor/{unique_param}
 exports.uniquePUT = function(req, res) {
+    var unique_param = req.params.id
     // Validate the posted data
     var donor = new Donor(req.body);
     donor.validate(function(err) {
-        if (!err) {
+        if (!err && validate.hex(unique_param)) {
             // Try to update record with matching unique_param on database
-            Donor.findOneAndUpdate({ unique_param: req.params.id }, req.body,
+            Donor.findOneAndUpdate({ unique_param: unique_param }, req.body,
             function(err, fresh) {
                 if (!err) {
                     // Success
-                    res.sendStatus(200)
+                    RETURN_UPDATED_DONOR(res, req.body, unique_param)
                 } else {
                     // Unexpected error while updating database
                     API_ERROR(res, err, 500)
                 }
             })
         } else {
-            // Invalid input
-            API_ERROR(res, err, 418)
+            VALIDATION_ERROR(res, err)
         }
     })
 }
@@ -105,35 +136,13 @@ exports.POST = function(req, res) {
             // Try saving
             donor.save(function(err) {
                 if (!err) {
-                    // delete donor._id will not work
-                    //
-                    // To use delete you would need to convert the model document into a 
-                    // plain JavaScript object by calling toObject so that you can freely manipulate it.
-                    // 
-                    // user = user.toObject();
-                    // delete user.salt;
-                    // delete user.pass;
-                    //
-                    // http://stackoverflow.com/questions/23342558/why-cant-i-delete-a-mongoose-models-object-properties
-                    donor._id = undefined;
-                    donor.__v = undefined;
-                    // Return unique id along with the saved data
-                    res.json({ unique_param: shasum, saved_data: donor })
+                    RETURN_UPDATED_DONOR(res, donor, shasum)
                 } else {
                     API_ERROR(res, err, 500)
                 }
             })
         } else {
-            var error_code = 0
-            if (err.errors.firstname) error_code |= 0x01;
-            if (err.errors.lastname)  error_code |= 0x02;
-            if (err.errors.phone)     error_code |= 0x04;
-            if (err.errors.email)     error_code |= 0x08;
-            if (err.errors.bloodtype) error_code |= 0x10;
-            if (err.errors.ipv4)      error_code |= 0x20;
-            if (err.errors.geo_x)     error_code |= 0x40;
-            if (err.errors.geo_y)     error_code |= 0x80;
-            res.status(418).json({e:error_code})
+            VALIDATION_ERROR(res, err)
         }
     })
 }
