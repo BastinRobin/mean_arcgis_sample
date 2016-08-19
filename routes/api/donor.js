@@ -22,7 +22,7 @@ router.route("/:id")
     .put(f.uniquePUT)
 
     // Delete donor information if private ID is supplied
-    .delete(unify)
+    .delete(f.uniqueDELETE)
 
 // Underlying unifier function @TODO seperate functions
 function unify(req, res) {

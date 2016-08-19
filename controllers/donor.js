@@ -1,6 +1,7 @@
 var CONFIG  = require("../config")
 var Donor   = require("../models/donor")
 var crypto  = require("crypto")
+var validate= require("../models/validation")
 
 function API_ERROR(res, err, code) {
     if (CONFIG.DEBUG) {
@@ -10,22 +11,62 @@ function API_ERROR(res, err, code) {
     res.sendStatus(code)
     // @TODO Improve this (maybe redirect to page? show dynamic message?)
 }
+function IP_TO_INT(str) {
+    var parts = str.split(".")
+    var int = 0
+    // Shift each part to fit an 32 bit ip number
+    int += parseInt(parts[0], 10) << 24
+    int += parseInt(parts[1], 10) << 16
+    int += parseInt(parts[2], 10) << 8
+    int += parseInt(parts[3], 10)
+    return int
+}
+function GET_IPv4(req) {
+    // Add the sender IP Address NOTE: x-forwarded-for can be spoofed.
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    // Remove IPv6 subnet prefix returned by express.js
+    // Example format returning by express => ::ffff:127.0.0.1
+    return ip.substring(7);    
+}
 
-// GET api/donor/{id}
+// DELETE api/donor/{unique_param}
+exports.uniqueDELETE = function(req, res) {
+    // Validate passed link parameter
+    if (validate.hex(req.params.id)) {
+        // Try to retrieve donor with matching unique_param
+        Donor.findOneAndRemove({ unique_param: req.params.id }, function(err, doc, result) {
+            if (!err) {
+                // Document before update. Returns null if no record to delete
+                if (!!doc) {
+                    res.sendStatus(200)
+                } else {
+                    // Not found
+                    API_ERROR(res, "Record not found: " + req.params.id, 404)
+                }
+            } else {
+                // Unexpected error
+                API_ERROR(res, err, 500)
+            }
+        })
+    } else {
+        // Invalid request
+        API_ERROR(res, err, 400)
+    }
+}
+// GET api/donor/{unique_param}
 exports.uniqueGET = function(req, res) {
     // Try to retrieve donor with matching unique_param
     Donor.find({ unique_param: req.params.id }, "-_id -unique_param", function(err, donor) {
         if (!err) {
             // Found record
             res.json(donor[0])
-        }
-        else {
+        } else {
             // Not match or unexpected error @TODO seperate them
             API_ERROR(res, err, 404)
         }
     })
 }
-// PUT api/donor/{id}
+// PUT api/donor/{unique_param}
 exports.uniquePUT = function(req, res) {
     // Validate the posted data
     var donor = new Donor(req.body);
@@ -37,14 +78,12 @@ exports.uniquePUT = function(req, res) {
                 if (!err) {
                     // Success
                     res.sendStatus(200)
-                }
-                else {
+                } else {
                     // Unexpected error while updating database
                     API_ERROR(res, err, 500)
                 }
             })
-        }
-        else {
+        } else {
             // Invalid input
             API_ERROR(res, err, 418)
         }
@@ -61,31 +100,18 @@ exports.POST = function(req, res) {
                 .update(JSON.stringify(donor)) // Take sha256 of donor info
                 .digest("hex") // To hex string
             donor.unique_param = shasum
-            // Add the sender IP Address NOTE: x-forwarded-for can be spoofed.
-            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            // Remove IPv6 subnet prefix returned by express.js
-            // Example format returning by express => ::ffff:127.0.0.1
-            ip = ip.substring(7);
             // Convert IP Address string to 32 bit number
-            var parts = ip.split(".")
-            var int = 0
-            int += parseInt(parts[0], 10) << 24
-            int += parseInt(parts[1], 10) << 16
-            int += parseInt(parts[2], 10) << 8
-            int += parseInt(parts[3], 10)
-            donor.ipv4 = int
+            donor.ipv4 = IP_TO_INT(GET_IPv4(req))
             // Try saving
             donor.save(function(err) {
                 if (!err) {
                     // Return unique id
                     res.json({ unique_param: shasum })
-                }
-                else {
+                } else {
                     API_ERROR(res, err, 500)
                 }
             })
-        }
-        else {
+        } else {
             var error_code = 0
             if (err.errors.firstname) error_code |= 0x01;
             if (err.errors.lastname)  error_code |= 0x02;

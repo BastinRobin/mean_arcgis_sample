@@ -68,10 +68,13 @@ $routeProvider
     $http.delete(url)
       .success(function() {
         alert("deleted")
+        $location.path("/")
       })
   }
   $scope.put = function(form) {
-    $http.put(url, $scope.data)
+    var body = $scope.data
+    delete body.ipv4
+    $http.put(url, body)
       .success(function() {
         alert('puted')
         $location.path("/")
