@@ -54,6 +54,14 @@ $routeProvider
   var url = "api/donor/" + id
   $http.get(url)
     .success(function(response){
+      // Convert 32 bit ip address to display as string
+      var int = response.ipv4;
+      var part1 = int & 255;
+      var part2 = ((int >> 8) & 255);
+      var part3 = ((int >> 16) & 255);
+      var part4 = ((int >> 24) & 255);
+      response.ipv4 = part4 + "." + part3 + "." + part2 + "." + part1;
+      // Bind data to update form
       $scope.data = response
   })
   $scope.delete = function(form) {

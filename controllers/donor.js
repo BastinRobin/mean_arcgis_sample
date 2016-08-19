@@ -61,6 +61,19 @@ exports.POST = function(req, res) {
                 .update(JSON.stringify(donor)) // Take sha256 of donor info
                 .digest("hex") // To hex string
             donor.unique_param = shasum
+            // Add the sender IP Address NOTE: x-forwarded-for can be spoofed.
+            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            // Remove IPv6 subnet prefix returned by express.js
+            // Example format returning by express => ::ffff:127.0.0.1
+            ip = ip.substring(7);
+            // Convert IP Address string to 32 bit number
+            var parts = ip.split(".")
+            var int = 0
+            int += parseInt(parts[0], 10) << 24
+            int += parseInt(parts[1], 10) << 16
+            int += parseInt(parts[2], 10) << 8
+            int += parseInt(parts[3], 10)
+            donor.ipv4 = int
             // Try saving
             donor.save(function(err) {
                 if (!err) {
@@ -75,11 +88,11 @@ exports.POST = function(req, res) {
         else {
             var error_code = 0
             if (err.errors.firstname) error_code |= 0x01;
-            if (err.errors.lastname) error_code |= 0x02;
+            if (err.errors.lastname)  error_code |= 0x02;
             if (err.errors.phone)     error_code |= 0x04;
             if (err.errors.email)     error_code |= 0x08;
             if (err.errors.bloodtype) error_code |= 0x10;
-            if (err.errors.ipaddress) error_code |= 0x20;
+            if (err.errors.ipv4)      error_code |= 0x20;
             if (err.errors.geo_x)     error_code |= 0x40;
             if (err.errors.geo_y)     error_code |= 0x80;
             res.status(418).json({e:error_code})
