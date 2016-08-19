@@ -28,6 +28,8 @@ var typecheck = function(type) {
     }
 }
 exports.name      = typecheck("string") // @TODO Real unicode name regexpr
+exports.phone     = regex(/^(0{2}|\+)[0-9]{12}$/)
 exports.email     = regex(/^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i)
 exports.bloodtype = regex(/^([ABO]|(AB))[\+\-]$/)
 exports.double    = regex(/^[-+]?[0-9]*\.?[0-9]+$/)
+exports.hex       = regex(/^[a-f0-9]*$/)

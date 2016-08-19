@@ -18,6 +18,14 @@ var donorSchema = new Schema({
             message: "Please provide a valid last name"
         }
     },
+    phone: {
+        type: String,
+        required: true,
+        validate: {
+            validator: validation.phone,
+            message: "Please provide a valid phone"
+        }
+    },
     email: {
         type: String,
         required: true,
@@ -33,6 +41,9 @@ var donorSchema = new Schema({
             validator: validation.bloodtype,
             message: "Please provide a valid bloodtype"
         }
+    },
+    ipv4: {
+        type: Number
     },
     geo_x: {
         type: Number,

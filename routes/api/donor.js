@@ -5,24 +5,24 @@ var router      = express.Router()
 // Get static donor edit page
 router.get("/edit/:id", unify)
 
-// POST /donor/
+// POST api/donor/
 // Create donor
 router.post("/", f.POST)
 
-// POST /donor/find
+// POST api/donor/find
 // Retrieve donor IDs in specified area on map
 router.post("/find", unify)
 
-// REST /donor/[id]
+// REST api/donor/{unique_id}
 router.route("/:id")
     // Retrieve donor information
-    .get(unify)
+    .get(f.uniqueGET)
 
     // Update donor information if private ID is supplied
-    .put(unify)
+    .put(f.uniquePUT)
 
     // Delete donor information if private ID is supplied
-    .delete(unify)
+    .delete(f.uniqueDELETE)
 
 // Underlying unifier function @TODO seperate functions
 function unify(req, res) {
