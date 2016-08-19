@@ -25,12 +25,13 @@ $routeProvider
 })
 .controller("MainCtrl", function ($scope, $http) {
   // Code below runs when donor submits form
-  $scope.post = function(form) {
+  $scope.create_donor = function(form) {
     // Make API call for to create new donor
     $http.post("api/donor/", $scope.data)
       .success(function(response) {
         // Show unique link to donor
         $scope.unique_link = "/donor/" + response.unique_param
+        $scope.saved_data = response.saved_data
         $scope.validation_errors = null;
       })
       .error(function(response) {
@@ -64,14 +65,14 @@ $routeProvider
       // Bind data to update form
       $scope.data = response
   })
-  $scope.delete = function(form) {
+  $scope.delete_donor = function(form) {
     $http.delete(url)
       .success(function() {
         alert("deleted")
         $location.path("/")
       })
   }
-  $scope.put = function(form) {
+  $scope.update_donor = function(form) {
     var body = $scope.data
     delete body.ipv4
     $http.put(url, body)

@@ -1,5 +1,5 @@
 <h2>Update your details</h2>
-<form ng-submit="put($element.action)">
+<form ng-submit="update_donor($element.action)">
     <li>Name=======<input type="text" name="firstname" ng-model="data.firstname"><br></li>
     <li>Lastname===<input type="text" name="lastname" ng-model="data.lastname"><br></li>
     <li>Phone======<input type="text" name="phone" ng-model="data.phone"><br></li>
@@ -10,6 +10,6 @@
     <p>Recorded IP Address: <span ng-bind="data.ipv4"></span></p>
     <input type="submit" value="Save changes">
 </form>
-<form ng-submit="delete($element.action)">
+<form ng-submit="delete_donor($element.action)">
     <input type="submit" value="Delete permanently">
 </form>

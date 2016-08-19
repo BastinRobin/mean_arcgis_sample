@@ -1,0 +1,5 @@
+<ul ng-show="saved_data">
+    Following information has been saved:
+    <li ng-repeat="info in saved_data">{{info}}</li>
+</ul>
+<a ng-show="unique_link" ng-href="{{unique_link}}">click me to update/delete donor information</a>

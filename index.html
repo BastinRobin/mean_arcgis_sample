@@ -14,8 +14,7 @@
     <script src="js/app.js"></script>
 </head>
 <body ng-app="bloodonate" ng-controller="MainCtrl">
-    <a ng-show="unique_link" ng-href="{{unique_link}}">click me</a>
-    <form ng-submit="post($element.action)">
+    <form ng-submit="create_donor($element.action)">
         <ul style="padding: 2px;">
             <li>Name=======<input type="text" name="firstname" ng-model="data.firstname"><br></li>
             <li>Lastname===<input type="text" name="lastname" ng-model="data.lastname"><br></li>

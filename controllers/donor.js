@@ -105,8 +105,20 @@ exports.POST = function(req, res) {
             // Try saving
             donor.save(function(err) {
                 if (!err) {
-                    // Return unique id
-                    res.json({ unique_param: shasum })
+                    // delete donor._id will not work
+                    //
+                    // To use delete you would need to convert the model document into a 
+                    // plain JavaScript object by calling toObject so that you can freely manipulate it.
+                    // 
+                    // user = user.toObject();
+                    // delete user.salt;
+                    // delete user.pass;
+                    //
+                    // http://stackoverflow.com/questions/23342558/why-cant-i-delete-a-mongoose-models-object-properties
+                    donor._id = undefined;
+                    donor.__v = undefined;
+                    // Return unique id along with the saved data
+                    res.json({ unique_param: shasum, saved_data: donor })
                 } else {
                     API_ERROR(res, err, 500)
                 }
