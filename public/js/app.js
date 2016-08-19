@@ -71,7 +71,7 @@ angular.module("bloodonate", ["ngRoute"])
         // Show unique link to donor
         $scope.donor.unique_link = "/donor/" + response.unique_param
 
-        response.ipv4 = INT_TO_STR_IP(response.ipv4)
+        response.saved_data.ipv4 = INT_TO_STR_IP(response.saved_data.ipv4)
         $scope.donor.saved_data = response.saved_data
         $scope.donor.validation_errors = null
         $location.path("/")
@@ -97,11 +97,12 @@ angular.module("bloodonate", ["ngRoute"])
   // Delete permanenty button action
   $scope.delete_donor = function(form) {
     $http.delete(url)
-      .success(function() {
+      .success(function(response) {
         // @TODO DRY? DELETE UPDATE delete_donor update_donor
         response.ipv4 = INT_TO_STR_IP(response.ipv4)
         // Show deleted data to user after operation
         $scope.donor.saved_data = response.saved_data
+        $scope.donor.unique_link = undefined;
         $location.path("/")
       })
       .error(function(response) {

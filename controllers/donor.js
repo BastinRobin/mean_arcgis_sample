@@ -3,6 +3,10 @@ var Donor   = require("../models/donor")
 var crypto  = require("crypto")
 var validate= require("../models/validation")
 
+// This function is used for responding back to client
+// Whenever something wents wrong and cant proceede further
+// Such as database errors, server errors, validation errors
+// invalid requests... list goes on.
 function API_ERROR(res, err, code) {
     if (CONFIG.DEBUG) {
         console.log(err)
@@ -11,6 +15,7 @@ function API_ERROR(res, err, code) {
     res.sendStatus(code)
     // @TODO Improve this (maybe redirect to page? show dynamic message?)
 }
+// Parses string ipv4 address and converts to number (32 bit)
 function IP_TO_INT(str) {
     var parts = str.split(".")
     var int = 0
@@ -21,13 +26,17 @@ function IP_TO_INT(str) {
     int += parseInt(parts[3], 10)
     return int
 }
+// Extract sender IP Address from request headers
+// NOTE: x-forwarded-for can be spoofed.
 function GET_IPv4(req) {
-    // Add the sender IP Address NOTE: x-forwarded-for can be spoofed.
+    // @TODO Improve this for security reasons
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     // Remove IPv6 subnet prefix returned by express.js
-    // Example format returning by express => ::ffff:127.0.0.1
+    // Example ip format returning by express => ::ffff:127.0.0.1
     return ip.substring(7);    
 }
+// This function completes request operation and Returns
+// updated donor information along with unique_param
 function RETURN_UPDATED_DONOR(res, donor, unique_param) {
     // delete donor._id will not work
     //
@@ -41,10 +50,14 @@ function RETURN_UPDATED_DONOR(res, donor, unique_param) {
     // http://stackoverflow.com/questions/23342558/why-cant-i-delete-a-mongoose-models-object-properties
     donor._id = undefined;
     donor.__v = undefined;
+    donor.unique_param = undefined;
     // Return unique id along with the saved data
     res.json({ unique_param: unique_param, saved_data: donor })
 }
 // Calculate the error code and sent back to client
+//
+// Explanations of error codes can be found in SRS document
+// Chapter 3 Other requirements #3 status messages of validation
 function VALIDATION_ERROR(res, err) {
     var error_code = 0
     if (err.errors.firstname) error_code |= 0x01;
