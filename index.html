@@ -14,17 +14,22 @@
     <script src="js/app.js"></script>
 </head>
 <body ng-app="bloodonate" ng-controller="MainCtrl">
-    <a href="donor/fb0a9b26347ad48b798f7ab3c0e64d7b711cf1cc0cb4228847521bc1d97607cb">click me</a>
-    <form action="api/donor/" method="POST">
+    <a ng-show="unique_link" ng-href="{{unique_link}}">click me</a>
+    <form ng-submit="post($element.action)">
         <ul style="padding: 2px;">
-            <li>Name=======<input type="text" name="firstname"><br></li>
-            <li>Lastname===<input type="text" name="lastname" id=""><br></li>
-            <li>Email======<input type="text" name="email" id=""><br></li>
-            <li>Bloodtype==<input type="text" name="bloodtype" id=""><br></li>
-            <li>GEO X======<input type="text" name="geo_x" id=""><br></li>
-            <li>GEO Y======<input type="text" name="geo_y" id=""><br></li>
+            <li>Name=======<input type="text" name="firstname" ng-model="data.firstname"><br></li>
+            <li>Lastname===<input type="text" name="lastname" ng-model="data.lastname"><br></li>
+            <li>Email======<input type="text" name="email" ng-model="data.email"><br></li>
+            <li>Bloodtype==<input type="text" name="bloodtype" ng-model="data.bloodtype"><br></li>
+            <li>GEO X======<input type="text" name="geo_x" ng-model="data.geo_x"><br></li>
+            <li>GEO Y======<input type="text" name="geo_y" ng-model="data.geo_y"><br></li>
         </ul>
-        <input type="submit" value="POST">
+        <p ng-show="validation_success">{{validation_success}}</p>
+        <ul ng-show="validation_errors">
+            Please resolve the errors:
+            <li ng-repeat="error in validation_errors">{{error}}</li>
+        </ul>
+        <input type="submit" value="Create new donor">
     </form>
     <ng-view></ng-view>
 </body>

@@ -5,15 +5,15 @@ var router      = express.Router()
 // Get static donor edit page
 router.get("/edit/:id", unify)
 
-// POST /donor/
+// POST api/donor/
 // Create donor
 router.post("/", f.POST)
 
-// POST /donor/find
+// POST api/donor/find
 // Retrieve donor IDs in specified area on map
 router.post("/find", unify)
 
-// REST /donor/{unique_id}
+// REST api/donor/{unique_id}
 router.route("/:id")
     // Retrieve donor information
     .get(f.uniqueGET)
