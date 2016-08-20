@@ -2,11 +2,14 @@ angular.module("bloodonateApp", ["ngRoute"])
   .config(function($routeProvider, $locationProvider) {
     $routeProvider
       .when("/", {
-        template: "index"
+        templateUrl: "views/index.html"
       })
       .when("/donor/success", {
         templateUrl: "views/donorSaved.html",
         controller: "DonorSavedController"
+      })
+      .when("/donor/notfound", {
+        templateUrl: "views/donorNotFound.html"
       })
       .when("/donor/find/:id", {
         templateUrl: "views/donorFind.html",

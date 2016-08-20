@@ -1,6 +1,9 @@
 angular.module("bloodonateApp").controller("DonorCreateController",
 function($scope, transfer, restful, $http, $routeParams, $location) {
-  // @TODO For debuging purposes only, remove the dummy form data
+  // @TODO For debuging purposes only
+  // If you planning to remove this in the future please be aware that
+  // create donor form is being initialized by ng-repeat on $scope.data
+  // So that you should at least pass empty string version of dummy below
   var dummy = {
     firstname: "Quick Test",
     lastname: "Auto Fill",
@@ -14,7 +17,10 @@ function($scope, transfer, restful, $http, $routeParams, $location) {
   // Code below runs when donor submits form
   $scope.create = function() {
     // Setup request payload
-    var data = $scope.data
+    //
+    // What is this hack? JSON JSON JASON
+    // http://stackoverflow.com/a/5344074/5917087
+    var data = JSON.parse(JSON.stringfy($scope.data))
     data.geo_x = $routeParams.x
     data.geo_y = $routeParams.y
     // Make API call for to create new donor
@@ -24,6 +30,7 @@ function($scope, transfer, restful, $http, $routeParams, $location) {
         restful.redirect.success(response)
       })
       .error(function(response) {
+        alert()
         $scope.validation_errors = restful.decodeError(response.e)
       })
   }
