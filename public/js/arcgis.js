@@ -2,8 +2,9 @@ require([
     "esri/tasks/Locator",
     "esri/Map",
     "esri/views/MapView",
+    "esri/widgets/Search",
     "dojo/domReady!"
-], function(Locator, Map, MapView ) {
+], function(Locator, Map, MapView, Search) {
 // Set up a locator task using the world geocoding service
 var locatorTask = new Locator({
     url: "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer"
@@ -21,6 +22,16 @@ var view = new MapView({
     center: [-116.3031, 43.6088],
     zoom: 12
 })
+var searchWidget = new Search({
+    view: view,
+    });
+searchWidget.startup();
+
+// Add the search widget to the top left corner of the view
+view.ui.add(searchWidget, {
+    position: "top-left",
+    index: 0
+});
 
 /*******************************************************************
  * This click event sets generic content on the popup not tied to
