@@ -20,7 +20,7 @@ var view = new MapView({
     container: "arcgis-map",
     map: map,
     center: [-116.3031, 43.6088],
-    zoom: 1
+    zoom: 12
 })
 // Set up a locator task using the world geocoding service
 var locatorTask = new Locator({
@@ -67,7 +67,7 @@ locatorTask.locationToAddress(evt.mapPoint).then(function(
     // If the promise fails and no result is found, print a generic message
     // to the popup's content
     view.popup.title = "No address was found for this location<br>" + 
-                       "However you can still donate on this location"
+                       "However you can still use this location"
 })})
 // Create a symbol for drawing the point
 var markerSymbol = new SimpleMarkerSymbol({
@@ -89,7 +89,11 @@ var createPoint = function(lon, lat, id) {
             })
         var pointGraphic = new Graphic({
             geometry: point,
-            symbol: markerSymbol
+            symbol: markerSymbol,
+            popupTemplate: new PopupTemplate({
+                content: "Donor information<br>" + 
+                         '<a href="/find/'+id+'">Click here to show</a>'
+            })
         });
         view.graphics.add(pointGraphic)
 
