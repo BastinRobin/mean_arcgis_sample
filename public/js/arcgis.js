@@ -11,7 +11,6 @@ require([
     "dojo/domReady!"
 ], function(Map, PopupTemplate, MapView, Graphic, Point, SimpleMarkerSymbol,
             Locator, Search, webMercatorUtils) {
-
 // Create the Map
 var map = new Map({
     basemap: "streets-navigation-vector"
@@ -23,47 +22,6 @@ var view = new MapView({
     center: [-116.3031, 43.6088],
     zoom: 1
 })
-
-         /**********************
-       * Create a point graphic
-       **********************/
-
-      // First create a point geometry (this is the location of the Titanic)
-      var point = new Point({
-        longitude: -49.97,
-        latitude: 41.73
-      });
-      var pointGraphic
-      setInterval(function(){
-          point.longitude -= 1;
-          console.log(point.longitude)
-          view.graphics.remove(pointGraphic)
-          pointGraphic = new Graphic({
-            geometry: point,
-            symbol: markerSymbol
-          });
-          view.graphics.add(pointGraphic)
-        },333)
-      // Create a symbol for drawing the point
-      var markerSymbol = new SimpleMarkerSymbol({
-        color: [226, 119, 40],
-        outline: { // autocasts as new SimpleLineSymbol()
-          color: [255, 255, 255],
-          width: 2
-        }
-      });
-
-      // Create a graphic and add the geometry and symbol to it
-      
-
-  // Add the line graphic to the view's GraphicsLayer
-  view.graphics.add(pointGraphic);
-
-
-
-
-
-  
 // Set up a locator task using the world geocoding service
 var locatorTask = new Locator({
     url: "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer"
@@ -111,31 +69,36 @@ locatorTask.locationToAddress(evt.mapPoint).then(function(
     view.popup.title = "No address was found for this location<br>" + 
                        "However you can still donate on this location"
 })})
+// Create a symbol for drawing the point
+var markerSymbol = new SimpleMarkerSymbol({
+    color: [226, 119, 40],
+    outline: { // autocasts as new SimpleLineSymbol()
+        color: [255, 255, 255],
+        width: 2
+    }
+});
+var point_graphics = {}
+var pointExists = function(id) {
+    return point_graphics[id] !== undefined
+}
+var createPoint = function(lon, lat, id) {
+    if (!pointExists(id)) {
+        var point =  new Point({
+                longitude: lon,
+                latitude: lat
+            })
+        var pointGraphic = new Graphic({
+            geometry: point,
+            symbol: markerSymbol
+        });
+        view.graphics.add(pointGraphic)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
+}
+var updatePoint = function(lon, lat, id) {
+    view.graphics.remove(point_graphics[id])
+    createPoint(lat, lon, id)
+}
 var P1 = 0
 var P2 = 0
 // Extract boundaries to be used with socket.io
@@ -175,7 +138,7 @@ setTimeout(load, 100)
 server.on("2", function(msg) {
   // Load pinpoints
   for (var i = msg.length - 1; i != -1; i-=1) {
-    console.log(msg[i])
+    createPoint(msg[i].geo_x, msg[i].geo_y, msg[i]._id)
   }
 })
 //w00t
