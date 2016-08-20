@@ -3,18 +3,17 @@ require([
     "esri/Map",
     "esri/views/MapView",
     "esri/widgets/Search",
+    "esri/geometry/support/webMercatorUtils",
     "dojo/domReady!"
-], function(Locator, Map, MapView, Search) {
+], function(Locator, Map, MapView, Search, webMercatorUtils) {
 // Set up a locator task using the world geocoding service
 var locatorTask = new Locator({
     url: "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer"
 })
-
 // Create the Map
 var map = new Map({
     basemap: "streets-navigation-vector"
 })
-
 // Create the MapView
 var view = new MapView({
     container: "arcgis-map",
@@ -22,17 +21,16 @@ var view = new MapView({
     center: [-116.3031, 43.6088],
     zoom: 12
 })
+// Setup search box
 var searchWidget = new Search({
     view: view,
-    });
-searchWidget.startup();
-
+    })
+searchWidget.startup()
 // Add the search widget to the top left corner of the view
 view.ui.add(searchWidget, {
     position: "top-left",
     index: 0
-});
-
+})
 /*******************************************************************
  * This click event sets generic content on the popup not tied to
  * a layer, graphic, or popupTemplate. The location of the point is
@@ -53,7 +51,6 @@ view.popup.open({
     content: "Reverse geocode: [" + lon + ", " + lat + "]" + 
              '<a href="@' + x + ':' + y + '">I can donate blood here</a>'
 })
-
 // Display the popup
 // Execute a reverse geocode using the clicked location
 locatorTask.locationToAddress(evt.mapPoint).then(function(
@@ -67,4 +64,57 @@ locatorTask.locationToAddress(evt.mapPoint).then(function(
     view.popup.title = "No address was found for this location<br>" + 
                        "However you can still donate on this location"
 })})
+
+
+
+
+
+
+
+
+
+
+var P1 = 0
+var P2 = 0
+// Extract boundaries to be used with socket.io
+setInterval(function(){
+    var v = view.extent
+    P1 = webMercatorUtils.xyToLngLat(v.xmin, v.ymin)
+    P2 = webMercatorUtils.xyToLngLat(v.xmax, v.ymax)
+}, 100)
+var server = io()
+var old_p1 = 0
+var old_p2 = 0
+// Coordinate boundaries are set undefined at the load stage of the map
+// So in order to avoid errors, first we set a listener whether map has
+// Loaded, after starting to get defined values from P1 and P2, we start 
+// to listen every 1500 ms for changes on P1 and P2, if there is a change 
+// we lazy load pinpoints in that area
+var load = function() {
+  if (P1 !== undefined && P2 !== undefined) {
+    // Map has been loaded (initialized)
+    // Setup the listener for navigation changes
+    setInterval(function(){
+      if (old_p1[0] != P1[0] || old_p1[1] != P1[1] || 
+          old_p2[0] != P2[0] || old_p2[1] != P2[1]) {
+          // Update old values with new ones
+          old_p1 = P1
+          old_p2 = P2
+          // Lazy load
+          server.emit("2", { x1: P1[0], y1: P1[1], x2: P2[0], y2: P2[1]})
+      }
+    }, 1500)
+  } else {
+    setTimeout(load, 100)
+  }
+}
+setTimeout(load, 100)
+// Server has sent pinpoints
+server.on("2", function(msg) {
+  // Load pinpoints
+  for (var i = msg.length - 1; i != -1; i-=1) {
+    console.log(msg[i])
+  }
+})
+//w00t
 })
