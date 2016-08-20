@@ -28,7 +28,7 @@ var ipToInt = function(str) {
 }
 // Extract sender IP Address from request headers
 // NOTE: x-forwarded-for can be spoofed.
-function GET_IPv4(req) {
+var getIpv4 = function(req) {
     // @TODO Improve this for security reasons
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     // Remove IPv6 subnet prefix returned by express.js
@@ -36,8 +36,8 @@ function GET_IPv4(req) {
     return ip.substring(7);    
 }
 // This function completes request operation and Returns
-// updated donor information along with unique_param
-function RETURN_UPDATED_DONOR(res, donor, unique_param) {
+// proper donor information along with unique_param
+var returnDonor = function(res, donor, unique_param) {
     // delete donor._id will not work
     //
     // To use delete you would need to convert the model document into a 
@@ -82,7 +82,7 @@ exports.findID = function(req, res) {
             if (err) {
                 // Unexpected error
                 sendError(res, err, 500)
-            } else if (!res) {
+            } else if (!donor) {
                 // Record not found
                 sendError(res, "Find id not found: " + id, 404)
             } else {
@@ -102,22 +102,18 @@ exports.uniqueDELETE = function(req, res) {
     if (validate.hex(unique_param)) {
         // Try to retrieve donor with matching unique_param
         Donor.findOneAndRemove({ unique_param: unique_param }, function(err, doc, result) {
-            if (!err) {
-                // Document before update. Returns null if no record to delete
-                if (!!doc) {
-                    RETURN_UPDATED_DONOR(res, doc, unique_param)
-                } else {
-                    // Not found
-                    sendError(res, "Record not found: " + unique_param, 404)
-                }
-            } else {
+            if (err) {
                 // Unexpected error
                 sendError(res, err, 500)
+            } else if (!doc) {
+                // Not found
+                sendError(res, "Record not found: " + unique_param, 404)
+            } else {
+                returnDonor(res, doc, unique_param)
             }
-            return 
         })
-        // Not found
-        sendError(res, "Record not found: " + unique_param, 404)
+        // Invalid request
+        sendError(res, "Record not found: " + unique_param, 400)
     } else {
         // Invalid request
         sendError(res, "Request id is not SHA256", 400)
@@ -129,17 +125,17 @@ exports.uniqueGET = function(req, res) {
     if (validate.hex(unique_param)) {
         // Try to retrieve donor with matching unique_param
         Donor.find({ unique_param: unique_param }, "-_id -unique_param -__v0 -geo_x -geo_y", function(err, donor) {
-            if (!err) {
+            if (err) {
+                // Unexpected error
+                sendError(res, err, 500)
+            } else if(!donor) {
+                // Not found
+                sendError(res, "Record not found: " + unique_param, 404)
+            } else {
                 // Found record
                 res.json(donor[0])
-            } else {
-                // Unexpected error
-                sendError(res, err, 404)
             }
-            return
         })
-        // Not found
-        sendError(res, "Record not found: " + unique_param, 404)
     } else {
         sendError(res, "Request id is not SHA256", 400)
     }
@@ -156,19 +152,18 @@ exports.uniquePUT = function(req, res) {
     donor.validate(function(err) {
         if (!err && validate.hex(unique_param)) {
             // Try to update record with matching unique_param on database
-            Donor.findOneAndUpdate({ unique_param: unique_param }, req.body,
-            function(err, fresh) {
-                if (!err) {
-                    // Success
-                    RETURN_UPDATED_DONOR(res, req.body, unique_param)
-                } else {
+            Donor.findOneAndUpdate({ unique_param: unique_param }, req.body, function(err, fresh) {
+                if (err) {
                     // Unexpected error while updating database
                      sendError(res, err, 500)
+                } else if (!fresh) {
+                    // Not found
+                     sendError(res, "Update unique_param not found", 404)
+                } else {
+                    // Success
+                    returnDonor(res, req.body, unique_param)
                 }
-                return
             })
-            // Not found
-            sendError(res, "Record not found: " + unique_param, 404)
         } else {
             VALIDATION_ERROR(res, err)
         }
@@ -186,11 +181,11 @@ exports.POST = function(req, res) {
                 .digest("hex") // To hex string
             donor.unique_param = shasum
             // Convert IP Address string to 32 bit number
-            donor.ipv4 = ipToInt(GET_IPv4(req))
+            donor.ipv4 = ipToInt(getIpv4(req))
             // Try saving
             donor.save(function(err) {
                 if (!err) {
-                    RETURN_UPDATED_DONOR(res, donor, shasum)
+                    returnDonor(res, donor, shasum)
                 } else {
                     sendError(res, err, 500)
                 }
