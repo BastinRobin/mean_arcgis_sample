@@ -29,7 +29,7 @@ io.on("connection", function(client) {
         validated &= validate.double(msg.y2)
         if (validated) {
             if (CONFIG.DEBUG) {
-                console.log("Socket.io: Lazy request:" + JSON.stringify(msg))
+                console.log("Socket.io: Got valid lazy request. Processing...")
             }
             Donor.find({})
                 .where("geo_x").gt(msg.x1).lt(msg.x2)

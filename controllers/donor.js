@@ -71,6 +71,7 @@ function VALIDATION_ERROR(res, err) {
     // @TODO TEAPOT
     res.status(418).json({e:error_code})
 }
+// GET api/donor/find/:id
 exports.findID = function(req, res) {
     var id = req.params.id
     // Validate passed link
@@ -84,10 +85,12 @@ exports.findID = function(req, res) {
                 // Not match or unexpected error @TODO seperate them
                 API_ERROR(res, err, 404)
             }
+            return
         })
+        API_ERROR(res, "Find request id has not found in db", 404)
     } else {
         // Invalid request
-        API_ERROR(res, err, 400)
+        API_ERROR(res, "Request id is not in hex format", 400)
     }
 }
 // DELETE api/donor/{unique_param}
@@ -109,10 +112,13 @@ exports.uniqueDELETE = function(req, res) {
                 // Unexpected error
                 API_ERROR(res, err, 500)
             }
+            return 
         })
+        // Not found
+        API_ERROR(res, "Record not found: " + unique_param, 404)
     } else {
         // Invalid request
-        API_ERROR(res, err, 400)
+        API_ERROR(res, "Request id is not SHA256", 400)
     }
 }
 // GET api/donor/{unique_param}
@@ -125,12 +131,15 @@ exports.uniqueGET = function(req, res) {
                 // Found record
                 res.json(donor[0])
             } else {
-                // Not match or unexpected error @TODO seperate them
+                // Unexpected error
                 API_ERROR(res, err, 404)
             }
+            return
         })
+        // Not found
+        API_ERROR(res, "Record not found: " + unique_param, 404)
     } else {
-        API_ERROR(res, err, 400)
+        API_ERROR(res, "Request id is not SHA256", 400)
     }
 }
 // PUT api/donor/{unique_param}
@@ -152,9 +161,12 @@ exports.uniquePUT = function(req, res) {
                     RETURN_UPDATED_DONOR(res, req.body, unique_param)
                 } else {
                     // Unexpected error while updating database
-                    API_ERROR(res, err, 500)
+                     API_ERROR(res, err, 500)
                 }
+                return
             })
+            // Not found
+            API_ERROR(res, "Record not found: " + unique_param, 404)
         } else {
             VALIDATION_ERROR(res, err)
         }
