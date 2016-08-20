@@ -4,6 +4,7 @@ var bodyParser  = require("body-parser")
 var mongoose    = require("mongoose")
 var http        = require("http").Server(app)
 var io          = require("socket.io")(http)
+var CONFIG    = require("./config")
 var Donor       = require("./models/donor")
 var validate    = require("./models/validation")
 var port        = 3000
@@ -27,6 +28,9 @@ io.on("connection", function(client) {
         validated &= validate.double(msg.y1)
         validated &= validate.double(msg.y2)
         if (validated) {
+            if (CONFIG.DEBUG) {
+                console.log("Socket.io: Got valid lazy request. Processing...")
+            }
             Donor.find({})
                 .where("geo_x").gt(msg.x1).lt(msg.x2)
                 .where("geo_y").gt(msg.y1).lt(msg.y2)
@@ -35,6 +39,9 @@ io.on("connection", function(client) {
                     if (!err) {
                         // Respond back with pinpoints
                         client.emit("2", result)
+                        if (CONFIG.DEBUG) {
+                            console.log("Socket.io: Responding with " + result.length + " record(s)")
+                        }
                     }
                     else {
                         if (CONFIG.DEBUG) {
@@ -45,6 +52,9 @@ io.on("connection", function(client) {
                     }
                 })
         } else {
+            if (CONFIG.DEBUG) {
+                console.log("Socket.io: Invalid request:" + msg)
+            }
             // Invalid request
             client.emit("0")
         }

@@ -2,16 +2,13 @@ var express     = require("express")
 var f           = require("../../controllers/donor")
 var router      = express.Router()
 
-// Get static donor edit page
-router.get("/edit/:id", unify)
-
 // POST api/donor/
 // Create donor
 router.post("/", f.POST)
 
-// POST api/donor/find
-// Retrieve donor IDs in specified area on map
-router.post("/find", unify)
+// GET api/donor/find/:id
+// Retrieve donor information (request by patient)
+router.get("/find/:id", f.findID)
 
 // REST api/donor/{unique_id}
 router.route("/:id")

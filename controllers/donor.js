@@ -7,7 +7,7 @@ var validate= require("../models/validation")
 // Whenever something wents wrong and cant proceede further
 // Such as database errors, server errors, validation errors
 // invalid requests... list goes on.
-function API_ERROR(res, err, code) {
+var sendError = function(res, err, code) {
     if (CONFIG.DEBUG) {
         console.log(err)
     }
@@ -16,7 +16,7 @@ function API_ERROR(res, err, code) {
     // @TODO Improve this (maybe redirect to page? show dynamic message?)
 }
 // Parses string ipv4 address and converts to number (32 bit)
-function IP_TO_INT(str) {
+var ipToInt = function(str) {
     var parts = str.split(".")
     var int = 0
     // Shift each part to fit an 32 bit ip number
@@ -71,6 +71,30 @@ function VALIDATION_ERROR(res, err) {
     // @TODO TEAPOT
     res.status(418).json({e:error_code})
 }
+// GET api/donor/find/:id
+exports.findID = function(req, res) {
+    var id = req.params.id
+    // Validate passed link
+    if (validate.hex(id)) {
+        // Try to retrieve donor with matching id
+        // Remember this db query is asynchronous call
+        Donor.find({ _id: id }, "-_id -unique_param -ipv4 -__v -geo_x -geo_y", function(err, donor) {
+            if (err) {
+                // Unexpected error
+                sendError(res, err, 500)
+            } else if (!res) {
+                // Record not found
+                sendError(res, "Find id not found: " + id, 404)
+            } else {
+                // Found record
+                res.json(donor[0])
+            }
+        })
+    } else {
+        // Invalid request
+        sendError(res, "Request id is not in hex format", 400)
+    }
+}
 // DELETE api/donor/{unique_param}
 exports.uniqueDELETE = function(req, res) {
     var unique_param = req.params.id
@@ -84,37 +108,51 @@ exports.uniqueDELETE = function(req, res) {
                     RETURN_UPDATED_DONOR(res, doc, unique_param)
                 } else {
                     // Not found
-                    API_ERROR(res, "Record not found: " + unique_param, 404)
+                    sendError(res, "Record not found: " + unique_param, 404)
                 }
             } else {
                 // Unexpected error
-                API_ERROR(res, err, 500)
+                sendError(res, err, 500)
             }
+            return 
         })
+        // Not found
+        sendError(res, "Record not found: " + unique_param, 404)
     } else {
         // Invalid request
-        API_ERROR(res, err, 400)
+        sendError(res, "Request id is not SHA256", 400)
     }
 }
 // GET api/donor/{unique_param}
 exports.uniqueGET = function(req, res) {
     var unique_param = req.params.id
-    // Try to retrieve donor with matching unique_param
-    Donor.find({ unique_param: unique_param }, "-_id -unique_param", function(err, donor) {
-        if (!err) {
-            // Found record
-            res.json(donor[0])
-        } else {
-            // Not match or unexpected error @TODO seperate them
-            API_ERROR(res, err, 404)
-        }
-    })
+    if (validate.hex(unique_param)) {
+        // Try to retrieve donor with matching unique_param
+        Donor.find({ unique_param: unique_param }, "-_id -unique_param -__v0 -geo_x -geo_y", function(err, donor) {
+            if (!err) {
+                // Found record
+                res.json(donor[0])
+            } else {
+                // Unexpected error
+                sendError(res, err, 404)
+            }
+            return
+        })
+        // Not found
+        sendError(res, "Record not found: " + unique_param, 404)
+    } else {
+        sendError(res, "Request id is not SHA256", 400)
+    }
 }
 // PUT api/donor/{unique_param}
 exports.uniquePUT = function(req, res) {
     var unique_param = req.params.id
     // Validate the posted data
     var donor = new Donor(req.body);
+    // @TODO WARNING: This still accepts geo_x ipv4 and along with Other
+    // valid field update on database table even we dont allow on 
+    // client-front-end
+    // A PUT request amongst with those fields aswell is still acceptable
     donor.validate(function(err) {
         if (!err && validate.hex(unique_param)) {
             // Try to update record with matching unique_param on database
@@ -125,9 +163,12 @@ exports.uniquePUT = function(req, res) {
                     RETURN_UPDATED_DONOR(res, req.body, unique_param)
                 } else {
                     // Unexpected error while updating database
-                    API_ERROR(res, err, 500)
+                     sendError(res, err, 500)
                 }
+                return
             })
+            // Not found
+            sendError(res, "Record not found: " + unique_param, 404)
         } else {
             VALIDATION_ERROR(res, err)
         }
@@ -145,13 +186,13 @@ exports.POST = function(req, res) {
                 .digest("hex") // To hex string
             donor.unique_param = shasum
             // Convert IP Address string to 32 bit number
-            donor.ipv4 = IP_TO_INT(GET_IPv4(req))
+            donor.ipv4 = ipToInt(GET_IPv4(req))
             // Try saving
             donor.save(function(err) {
                 if (!err) {
                     RETURN_UPDATED_DONOR(res, donor, shasum)
                 } else {
-                    API_ERROR(res, err, 500)
+                    sendError(res, err, 500)
                 }
             })
         } else {

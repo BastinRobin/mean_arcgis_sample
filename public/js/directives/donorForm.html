@@ -1,0 +1,4 @@
+<div ng-repeat="(key, field) in data" class="form-group">
+    <label for="formInput{{key}}">{{key}}</label>
+    <input ng-model="data[key]" type="text" class="form-control" id="formInput{{key}}" placeholder="{{key}}">
+</div>
