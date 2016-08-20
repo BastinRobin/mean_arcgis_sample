@@ -71,6 +71,25 @@ function VALIDATION_ERROR(res, err) {
     // @TODO TEAPOT
     res.status(418).json({e:error_code})
 }
+exports.findID = function(req, res) {
+    var id = req.params.id
+    // Validate passed link
+    if (validate.hex(id)) {
+        // Try to retrieve donor with matching unique_param
+        Donor.find({ _id: id }, "-_id -unique_param -ipv4 -__v -geo_x -geo_y", function(err, donor) {
+            if (!err) {
+                // Found record
+                res.json(donor[0])
+            } else {
+                // Not match or unexpected error @TODO seperate them
+                API_ERROR(res, err, 404)
+            }
+        })
+    } else {
+        // Invalid request
+        API_ERROR(res, err, 400)
+    }
+}
 // DELETE api/donor/{unique_param}
 exports.uniqueDELETE = function(req, res) {
     var unique_param = req.params.id
@@ -99,22 +118,30 @@ exports.uniqueDELETE = function(req, res) {
 // GET api/donor/{unique_param}
 exports.uniqueGET = function(req, res) {
     var unique_param = req.params.id
-    // Try to retrieve donor with matching unique_param
-    Donor.find({ unique_param: unique_param }, "-_id -unique_param", function(err, donor) {
-        if (!err) {
-            // Found record
-            res.json(donor[0])
-        } else {
-            // Not match or unexpected error @TODO seperate them
-            API_ERROR(res, err, 404)
-        }
-    })
+    if (validate.hex(unique_param)) {
+        // Try to retrieve donor with matching unique_param
+        Donor.find({ unique_param: unique_param }, "-_id -unique_param -__v0 -geo_x -geo_y", function(err, donor) {
+            if (!err) {
+                // Found record
+                res.json(donor[0])
+            } else {
+                // Not match or unexpected error @TODO seperate them
+                API_ERROR(res, err, 404)
+            }
+        })
+    } else {
+        API_ERROR(res, err, 400)
+    }
 }
 // PUT api/donor/{unique_param}
 exports.uniquePUT = function(req, res) {
     var unique_param = req.params.id
     // Validate the posted data
     var donor = new Donor(req.body);
+    // @TODO WARNING: This still accepts geo_x ipv4 and along with Other
+    // valid field update on database table even we dont allow on 
+    // client-front-end
+    // A PUT request amongst with those fields aswell is still acceptable
     donor.validate(function(err) {
         if (!err && validate.hex(unique_param)) {
             // Try to update record with matching unique_param on database

@@ -1,0 +1,12 @@
+<div ng-show="data" class="panel panel-success">
+    <div class="panel-heading">
+        <icon name="ok" text="Success"></icon>
+        Following information has been saved successfully
+    </div>
+    <div class="panel-body">
+        <ul class="list-group">
+            <li ng-repeat="info in data" class="list-group-item">{{info}}</li>
+        </ul>
+        <a ng-show="uniqueLink" ng-href="{{uniqueLink}}" class="btn btn-primary">Edit information</a>
+    </div>
+</div>

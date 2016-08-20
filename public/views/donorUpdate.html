@@ -1,0 +1,15 @@
+<div ng-show="data" class="panel panel-primary">
+    <div class="panel-heading">
+        <icon name="pencil" text="Success"></icon>
+        Update your information
+    </div>
+    <div class="panel-body">
+        <div donor-form="data"></div>
+        <br>
+        <p>Recorded IP Address: <span ng-bind="data.ipv4"></span></p>
+        <div donor-form-errors="validation_errors"></div>
+        <br>
+        <input type="submit" value="Save changes" ng-click="update()" class="btn btn-primary">
+        <input type="submit" value="Delete" ng-click="delete()" class="btn btn-danger">
+    </div>
+</div>

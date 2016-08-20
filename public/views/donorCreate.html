@@ -1,0 +1,12 @@
+<div ng-show="data" class="panel panel-primary">
+    <div class="panel-heading">
+        <icon name="pencil" text="Success"></icon>
+        Please fill your information
+    </div>
+    <div class="panel-body">
+        <div donor-form="data"></div>
+        <div donor-form-errors="validation_errors"></div>
+        <br>
+        <input type="submit" value="Save changes" ng-click="create()" class="btn btn-primary">
+    </div>
+</div>
