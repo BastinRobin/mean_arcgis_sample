@@ -25,7 +25,7 @@ function ($scope, transfer, restful, $routeParams, $http, $location) {
       })
   }
   // Save changes button action
-  $scope.update = function() {
+  $scope.saveMethod = function() {
     // Hard copy scope data
     var body = JSON.parse(JSON.stringify($scope.data))
     delete body.ipv4

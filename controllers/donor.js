@@ -165,7 +165,7 @@ exports.uniquePUT = function(req, res) {
                     // Success, let's broadcast this to everyone
                     if (CONFIG.DEBUG) console.log("Socket.io: Broadcast update: " + fresh._id)
                     io.broadcastUpdate(fresh._id, fresh.geo_x, fresh.geo_y)
-                    returnDonor(res, req.body, unique_param)
+                    returnDonor(res, fresh, unique_param)
                 }
             })
         } else {
