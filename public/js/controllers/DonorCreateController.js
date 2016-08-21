@@ -20,18 +20,17 @@ function($scope, transfer, restful, $http, $routeParams, $location) {
     //
     // What is this hack? JSON JSON JASON
     // http://stackoverflow.com/a/5344074/5917087
-    var data = JSON.parse(JSON.stringfy($scope.data))
+    var data = JSON.parse(JSON.stringify($scope.data))
     data.geo_x = $routeParams.x
     data.geo_y = $routeParams.y
     // Make API call for to create new donor
     $http.post("api/donor/", data)
       .success(function(response) {
         // Pass the response and let restful service do the rest
-        restful.redirect.success(response)
+        restful.redirectInfo("success", response)
       })
       .error(function(response) {
-        alert()
-        $scope.validation_errors = restful.decodeError(response.e)
+        $scope.errors = restful.decodeError(response.e)
       })
   }
 })

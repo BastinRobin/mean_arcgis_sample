@@ -7,9 +7,10 @@
         <div donor-form="data"></div>
         <br>
         <p>Recorded IP Address: <span ng-bind="data.ipv4"></span></p>
-        <div donor-form-errors="validation_errors"></div>
+        <div donor-errors="errors"></div>
         <br>
         <input type="submit" value="Save changes" ng-click="update()" class="btn btn-primary">
         <input type="submit" value="Delete" ng-click="delete()" class="btn btn-danger">
+        <a href="/" class="btn btn-default">Cancel</a>
     </div>
 </div>

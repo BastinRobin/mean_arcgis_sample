@@ -6,7 +6,6 @@ function($scope, $http, $routeParams, $location) {
       $scope.data = response
     })
     .error(function(response) {
-      alert()
       $location.path("/donor/notfound")
     })
 })

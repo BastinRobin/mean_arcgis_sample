@@ -11,30 +11,32 @@ function ($scope, transfer, restful, $routeParams, $http, $location) {
     })
     .error(function(response) {
       // @TODO Redirect 404 page?
-      $location.path("/")
+      $location.path("/donor/notfound")
     })
   // Delete permanenty button action
   $scope.delete = function() {
     $http.delete(url)
       .success(function(response) {
-        // Pass the response and let restful service do the rest
-        restful.redirect.success(response)
+        delete response.unique_param
+        $location.path("/donor/deleted")
       })
       .error(function(response) {
-        $scope.validation_errors = SERVER_VALIDATION_ERROR(response)
+        $location.path("/donor/notfound")
       })
   }
   // Save changes button action
   $scope.update = function() {
-    var body = $scope.data
+    // Hard copy scope data
+    var body = JSON.parse(JSON.stringify($scope.data))
     delete body.ipv4
     $http.put(url, body)
       .success(function(response) {
         // Pass the response and let restful service do the rest
-        restful.redirect.success(response)
+        restful.redirectInfo("success", response)
       })
       .error(function(response) {
-        $scope.validation_errors = restful.decodeError(response)
+        // Decode the error code and display it under the update form
+        $scope.errors = restful.decodeError(response.e)
       })
   }
 })

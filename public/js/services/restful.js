@@ -45,18 +45,16 @@ angular.module("bloodonateApp")
         // Server validation error decoder
         decodeError: decodeError,
         ipToString: ipToString,
-        redirect: {
-            success: function(response) {
-                // Convert 32 bit IP returned from server to string
-                response.saved_data.ipv4 = ipToString(response.saved_data.ipv4)
-                var saved = {
-                    data: response.saved_data,
-                    uniqueLink: '/donor/' + response.unique_param,
-                }
-                // Transfer saved data to DonorSavedController
-                transfer.saved = saved
-                $location.path("/donor/success")
+        redirectInfo: function(link, response) {
+            // Convert 32 bit IP returned from server to string
+            response.saved_data.ipv4 = ipToString(response.saved_data.ipv4)
+            var saved = {
+                data: response.saved_data,
+                uniqueLink: '/donor/' + response.unique_param,
             }
+            // Transfer saved data to DonorSavedController
+            transfer.saved = saved
+            $location.path("/donor/"+link)
         }
     }
 })
