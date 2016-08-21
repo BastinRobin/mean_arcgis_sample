@@ -168,6 +168,9 @@ server.on("2", function(msg) {
   for (var i = msg.length - 1; i != -1; i-=1) {
     createPoint(msg[i].geo_x, msg[i].geo_y, msg[i]._id)
   }
+server.on("3", function(msg) {
+    alert(msg.id)
+})
 })
 //w00t
 })

@@ -4,7 +4,7 @@ var bodyParser  = require("body-parser")
 var mongoose    = require("mongoose")
 var http        = require("http").Server(web)
 var sockets     = require("socket.io")(http)
-var io          = require("./io")(sockets)
+var io          = require("./io").start(sockets)
 var port        = 3000
 
 // Setup body-parser
