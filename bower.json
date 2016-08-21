@@ -1,0 +1,29 @@
+{
+  "name": "crossover",
+  "description": "CROSSOVER Tech Trial Web Application Bloodonate+",
+  "main": "index.js",
+  "authors": [
+    "Emirhan Ozlen"
+  ],
+  "license": "GPL-3.0",
+  "keywords": [
+    "MEAN",
+    "RESTFul",
+    "WebApp"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "font-awesome": "^4.6.3",
+    "animate.css": "^3.5.2",
+    "angular": "^1.5.8",
+    "angular-route": "^1.5.8"
+  }
+}

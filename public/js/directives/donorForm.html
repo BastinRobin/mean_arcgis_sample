@@ -1,0 +1,9 @@
+<form name="form" novalidate>
+    <div ng-repeat="(key, field) in data" class="form-group" ng-class="{ 'has-error' : form.{{key}}.$invalid && !form.{{key}}.$pristine }">
+        <label for="formInput{{key}}" class="text-capitalize">{{key}}</label>
+        <input name="{{key}}" ng-model="data[key]" type="text" class="form-control" id="formInput{{key}}" placeholder="{{key}}" required>
+        <p ng-show="form.{{key}}.$invalid && !form.{{key}}.$pristine" class="help-block text-capitalize">{{key}} is required.</p>
+    </div>
+    <input type="submit" value="Save changes" ng-click="saveMethod()" ng-disabled="!form.$valid" class="btn btn-primary">
+    <a href="/" class="btn btn-default">Cancel</a>
+</form>
