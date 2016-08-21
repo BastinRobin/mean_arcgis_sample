@@ -162,7 +162,9 @@ exports.uniquePUT = function(req, res) {
                     // Not found
                      sendError(res, "Update unique_param not found", 404)
                 } else {
-                    // Success
+                    // Success, let's broadcast this to everyone
+                    if (CONFIG.DEBUG) console.log("Socket.io: Broadcast update: " + fresh._id)
+                    io.broadcastUpdate(fresh._id, fresh.geo_x, fresh.geo_y)
                     returnDonor(res, req.body, unique_param)
                 }
             })

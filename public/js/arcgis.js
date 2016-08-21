@@ -171,6 +171,9 @@ server.on("2", function(msg) {
 server.on("3", function(msg) {
     alert(msg.id)
 })
+server.on("1", function(msg) {
+    alert(JSON.stringify(msg))
+})
 })
 //w00t
 })
