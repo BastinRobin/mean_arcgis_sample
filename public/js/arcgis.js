@@ -103,14 +103,19 @@ var createPoint = function(lon, lat, id) {
         });
         // Add point to map
         view.graphics.add(pointGraphic)
+        point_graphics[id] = pointGraphic
     }
+}
+var deletePoint = function(id) {
+    view.graphics.remove(point_graphics[id])
+    delete point_graphics[id]
 }
 var updatePoint = function(lon, lat, id) {
     // There is no native update method built in with ArcGIS API
     // (Thanks for well documentation ArcGIS Team,
     // took my 1 hour to come up with)
-    view.graphics.remove(point_graphics[id])
-    createPoint(lat, lon, id)
+    deletePoint(id)
+    createPoint(lon, lat, id)
 }
 var P1 = undefined
 var P2 = undefined
@@ -169,10 +174,15 @@ server.on("2", function(msg) {
     createPoint(msg[i].geo_x, msg[i].geo_y, msg[i]._id)
   }
 server.on("3", function(msg) {
-    alert(msg.id)
+    if (pointExists(msg._id)) {
+        deletePoint(msg._id)
+    }
 })
 server.on("1", function(msg) {
-    alert(JSON.stringify(msg))
+    if (pointExists(msg._id)) {
+        console.log('333')
+        updatePoint(msg.lon, msg.lat, msg._id)
+    }
 })
 })
 //w00t
