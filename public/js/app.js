@@ -11,6 +11,9 @@ angular.module("bloodonateApp", ["ngRoute"])
       .when("/donor/notfound", {
         templateUrl: "views/donorNotFound.html"
       })
+      .when("/donor/deleted", {
+        templateUrl: "views/donorDeleted.html"
+      })
       .when("/donor/find/:id", {
         templateUrl: "views/donorFind.html",
         controller: "DonorFindController"

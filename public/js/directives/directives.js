@@ -9,7 +9,19 @@ angular.module("bloodonateApp")
 .directive("donorErrors", function() {
     return {
         restrict: "A",
-        templateUrl: "/js/directives/donorErrors.html"
+        templateUrl: "/js/directives/donorErrors.html",
+        scope: true
+    }
+})
+.directive("panel", function() {
+    return {
+        restrict: "E",
+        templateUrl: "js/directives/panel.html",
+        scope: {
+            type: "@",
+            body: "@",
+            title: "@"  
+        }
     }
 })
 .directive("icon", function() {

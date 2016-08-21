@@ -58,7 +58,7 @@ var returnDonor = function(res, donor, unique_param) {
 //
 // Explanations of error codes can be found in SRS document
 // Chapter 3 Other requirements #3 status messages of validation
-function VALIDATION_ERROR(res, err) {
+var validationError = function(res, err) {
     var error_code = 0
     if (err.errors.firstname) error_code |= 0x01;
     if (err.errors.lastname)  error_code |= 0x02;
@@ -82,7 +82,7 @@ exports.findID = function(req, res) {
             if (err) {
                 // Unexpected error
                 sendError(res, err, 500)
-            } else if (!donor) {
+            } else if (!donor.length) {
                 // Record not found
                 sendError(res, "Find id not found: " + id, 404)
             } else {
@@ -112,8 +112,6 @@ exports.uniqueDELETE = function(req, res) {
                 returnDonor(res, doc, unique_param)
             }
         })
-        // Invalid request
-        sendError(res, "Record not found: " + unique_param, 400)
     } else {
         // Invalid request
         sendError(res, "Request id is not SHA256", 400)
@@ -124,11 +122,11 @@ exports.uniqueGET = function(req, res) {
     var unique_param = req.params.id
     if (validate.hex(unique_param)) {
         // Try to retrieve donor with matching unique_param
-        Donor.find({ unique_param: unique_param }, "-_id -unique_param -__v0 -geo_x -geo_y", function(err, donor) {
+        Donor.find({ unique_param: unique_param }, "-_id -unique_param -__v", function(err, donor) {
             if (err) {
                 // Unexpected error
                 sendError(res, err, 500)
-            } else if(!donor) {
+            } else if(donor.length) {
                 // Not found
                 sendError(res, "Record not found: " + unique_param, 404)
             } else {
@@ -156,6 +154,7 @@ exports.uniquePUT = function(req, res) {
                 if (err) {
                     // Unexpected error while updating database
                      sendError(res, err, 500)
+                // findOne... returns null if no match
                 } else if (!fresh) {
                     // Not found
                      sendError(res, "Update unique_param not found", 404)
@@ -165,7 +164,7 @@ exports.uniquePUT = function(req, res) {
                 }
             })
         } else {
-            VALIDATION_ERROR(res, err)
+            validationError(res, err)
         }
     })
 }
@@ -191,7 +190,7 @@ exports.POST = function(req, res) {
                 }
             })
         } else {
-            VALIDATION_ERROR(res, err)
+            validationError(res, err)
         }
     })
 }
