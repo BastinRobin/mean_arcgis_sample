@@ -1,6 +1,4 @@
-# Project Title
-
-One Paragraph of project description goes here
+# CROSSOVER Tech Trial Bloodonate+ Web Application
 
 ## Getting Started
 
@@ -8,27 +6,43 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisities
 
-What things you need to install the software and how to install them
+nodejs npm
 
-```
-Give examples
-```
+1. sudo su
+2. apt-get update
+3. apt-get install mongodb -y
+4. apt-get install nodejs -y
+
+and run
+
+5- npm install
+
+at the directory where packages.json file located
 
 ### Installing & Deployment
 
 Basically, one should be able to run a node server, npm install packages along with packages.json come up with this project.
 
-For great detailed information please refer to user guide documentation which has written for these purposes only, under docs/ folder
+Run these from each on seperate terminal:
+
+* $ node server.js
+* $ mongo --dbpath data/db
+
+Or if you are a linux youser you can ./start the bash script that included at root folder or application
 
 ### Coding style & Naming conventions
 
-@TODO
+JavaScript
+----------
+
+* No ; at the end
+* Use double quote "string" not 'string'
 
 ## Built With
 
-* Dropwizard - Bla bla bla
-* Maven - Maybe
-* Atom - ergaerga
+* MEAN Stack
+* Socket.io
+* Coffee
 
 ## Contributing
 
@@ -44,11 +58,11 @@ Git
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the GNU-3.0 License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
 * Me myself and all humanity come up with the idea of computer
 * J.S.Bach for endless hours of World's best music
-* Should I have to mention coffee?
+* Did I mention coffee?
 
