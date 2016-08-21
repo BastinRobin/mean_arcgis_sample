@@ -1,10 +1,12 @@
 <div ng-show="data" class="panel panel-info">
     <div class="panel-heading">
-        <h2>Donor information</h2>
+        <icon name="ok" text="Success"></icon>
+        Donor information
     </div>
     <div class="panel-body">
-        <div donor-form="data"></div>
-        <p ng-show="error">{{error}}</p>
-        <a href="/" class="btn btn-default">Return</a>
+        <ul class="list-group">
+            <li ng-repeat="info in data" class="list-group-item">{{info}}</li>
+        </ul>
+        <a ng-show="uniqueLink" ng-href="{{uniqueLink}}" class="btn btn-primary">Edit information</a>
     </div>
 </div>
