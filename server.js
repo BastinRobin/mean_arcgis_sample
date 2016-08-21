@@ -17,7 +17,7 @@ web.use(express.static(__dirname + "/public"))
 web.get('*',            require("./routes/index.js"));
 
 // Ready-set-GO!
-mongoose.connect("mongodb://emirhan:j-aG3MFHhcboFVmLCzBA@bloodonate-5692.mongo.dbs.appsdeck.eu/bloodonate-5692")
+mongoose.connect("mongodb://emirhan2:123123123@bloodonate-5692.mongo.dbs.appsdeck.eu/bloodonate-5692")
 http.listen(port, function() {
     console.log()
     console.log("It's happening.")
