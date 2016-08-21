@@ -2,7 +2,7 @@ var CONFIG  = require("../config")
 var Donor   = require("../models/donor")
 var crypto  = require("crypto")
 var validate= require("../models/validation")
-
+var io      = require("../io")
 // This function is used for responding back to client
 // Whenever something wents wrong and cant proceede further
 // Such as database errors, server errors, validation errors
@@ -109,6 +109,9 @@ exports.uniqueDELETE = function(req, res) {
                 // Not found
                 sendError(res, "Record not found: " + unique_param, 404)
             } else {
+                // Broadcast pinpoint delete
+                if (CONFIG.DEBUG) console.log("Socket.io: Broadcast delete: " + doc._id)
+                io.broadcastDelete(doc._id)
                 returnDonor(res, doc, unique_param)
             }
         })
@@ -126,7 +129,7 @@ exports.uniqueGET = function(req, res) {
             if (err) {
                 // Unexpected error
                 sendError(res, err, 500)
-            } else if(donor.length) {
+            } else if (!donor.length) {
                 // Not found
                 sendError(res, "Record not found: " + unique_param, 404)
             } else {
@@ -159,8 +162,10 @@ exports.uniquePUT = function(req, res) {
                     // Not found
                      sendError(res, "Update unique_param not found", 404)
                 } else {
-                    // Success
-                    returnDonor(res, req.body, unique_param)
+                    // Success, let's broadcast this to everyone
+                    if (CONFIG.DEBUG) console.log("Socket.io: Broadcast update: " + fresh._id)
+                    io.broadcastUpdate(fresh._id, fresh.geo_x, fresh.geo_y)
+                    returnDonor(res, fresh, unique_param)
                 }
             })
         } else {

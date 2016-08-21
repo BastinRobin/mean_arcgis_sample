@@ -2,7 +2,7 @@ var CONFIG    = require("./config")
 var Donor     = require("./models/donor")
 var validate  = require("./models/validation")
 
-exports = module.exports = function(io) {
+exports.start = function(io) {
     io.sockets.on("connection", function(client) {
     // Client requests the pinpoints in area
     client.on("2", function(msg) {
@@ -43,5 +43,11 @@ exports = module.exports = function(io) {
             client.emit("0")
         }
     })
+    exports.broadcastDelete = function(_id) {
+        io.sockets.emit("3", {_id: _id})
+    }
+    exports.broadcastUpdate = function(_id, x, y) {
+        io.sockets.emit("1", {_id: _id, lon: x, lat: y})
+    }
 })
 }

@@ -15,7 +15,7 @@ function($scope, transfer, restful, $http, $routeParams, $location) {
   // Server side validation errors
   $scope.validation_errors = null
   // Code below runs when donor submits form
-  $scope.create = function() {
+  $scope.saveMethod = function() {
     // Setup request payload
     //
     // What is this hack? JSON JSON JASON
