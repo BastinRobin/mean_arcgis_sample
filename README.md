@@ -1,4 +1,8 @@
-# CROSSOVER Tech Trial Bloodonate+ Web Application
+# Bloodonate+ Web Application wit ArcGIS and MEAN Stack
+## What this is?
+
+This was a project that I have developed for my job application on CROSSOVER company. Please refer to docs/SoftwareRequirementAnalysis.pdf for to understand what this project is about.
+
 
 ## Getting Started
 
